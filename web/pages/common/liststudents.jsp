@@ -22,26 +22,53 @@
                 <form action="Controller" method="post" class="form-container">
                     <c:forEach var="student" items="${studentsList}">
                         <c:forEach var="archive" items="${marksList}">
-                            <c:if test="${user.role==2}">
+                            <c:if test="${student.id==archive.userId}">
+                                <c:if test="${student.role==2}">
+                                    <fmt:message key="list.students.teacher"/>
+                                </c:if>
+                                <c:if test="${student.role==3}">
+                                    <fmt:message key="list.students.student"/>
+                                </c:if>
                                 <div class="form-title"><c:out value="${student.name}"/> <c:out
-                                        value="${student.surname}"/> <input class="form-smallfield" type="text"
-                                                                            name="${student.id}" pattern="^10$|^[1-9]$"
-                                                                            required/>
-                                </div>
-                            </c:if>
-                            <c:if test="${user.role==1}">
-                                <div class="form-title"><c:out value="${student.name}"/> <c:out
-                                        value="${student.surname}"/> <c:out value="${archive.mark}"/>
+                                        value="${student.surname}"/>
+                                    <c:if test="${user.role==2}">
+                                        <c:if test="${student.role!=2}">
+                                            <c:if test="${archive.mark==0}">
+                                                <c:set var="nomark" value="true"/>
+                                                <input class="form-smallfield" type="text" name="${student.id}"
+                                                       pattern="^10$|^[1-9]$"
+                                                       required/>
+                                            </c:if>
+                                            <c:if test="${archive.mark!=0}">
+                                                <c:out value="${archive.mark}"/>
+                                            </c:if>
+                                        </c:if>
+                                    </c:if>
+                                    <c:if test="${user.role==1}">
+                                        <c:if test="${student.role==3}">
+                                            <c:out value="${archive.mark}"/>
+                                        </c:if>
+                                        <c:if test="${studentsListSize==1}">
+                                            <div class="submit-container">
+                                                <input type="hidden" name="teacherId" value="${student.id}">
+                                                <input type="hidden" name="page" value="delete_course">
+                                                <button class="submit-button" type="submit"><fmt:message key="list.students.delete.course"/></button>
+                                            </div>
+                                        </c:if>
+                                    </c:if>
                                 </div>
                             </c:if>
                         </c:forEach>
                     </c:forEach>
+
                     <c:if test="${user.role==2}">
-                        <div class="submit-container">
-                            <input type="hidden" name="page" value="set_marks"/>
-                            <button class="submit-button" type="submit"><fmt:message
-                                    key="list.students.set.mark"/></button>
-                        </div>
+                        <c:if test="${nomark==true}">
+                            <div class="submit-container">
+                                <input type="hidden" name="page" value="set_marks"/>
+                                <button class="submit-button" type="submit"><fmt:message
+                                        key="list.students.set.mark"/></button>
+                            </div>
+                        </c:if>
                     </c:if>
 
                 </form>

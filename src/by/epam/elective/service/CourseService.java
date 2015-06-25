@@ -3,7 +3,10 @@ package by.epam.elective.service;
 import by.epam.elective.dao.AbstractCourseDAO;
 import by.epam.elective.dao.CourseDAO;
 import by.epam.elective.entity.Course;
+import by.epam.elective.exception.LogicalException;
 import by.epam.elective.exception.TechnicalException;
+import by.epam.elective.resource.ConfigurationManager;
+import by.epam.elective.validator.FormValidator;
 import org.apache.log4j.Logger;
 
 import java.text.ParseException;
@@ -23,25 +26,30 @@ public class CourseService {
     public static final int COURSE_OPENED_AND_CLOSED_STATUS = 10;
     private AbstractCourseDAO courseDAO = new CourseDAO();
 
-    public boolean addCourse(String courseName, int status, String startDate, String endDate, int teacherId) {
+    public boolean addCourse(String courseName, int status, String startDate, String endDate, int teacherId) throws LogicalException {
         boolean isDone = false;
-        try {
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_PARSE_PATTERN);
-            Date parsedStartDate = simpleDateFormat.parse(startDate);
-            Date parsedEndDate = simpleDateFormat.parse(endDate);
-            Course newCourse = new Course(courseName, status, parsedStartDate, parsedEndDate);
-            isDone = courseDAO.addCourse(newCourse);
-            ArrayList<Course> courses = courseDAO.findCoursesByStatus(COURSE_OPENED_STATUS);
-            int courseId = 0;
-            for (Course course : courses) {
-                if (course.getName().equals(courseName)) {
-                    courseId = course.getId();
+        FormValidator validator = new FormValidator();
+        if ((validator.validate("startDate", startDate)) && (validator.validate("endDate", endDate))) {
+            try {
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_PARSE_PATTERN);
+                Date parsedStartDate = simpleDateFormat.parse(startDate);
+                Date parsedEndDate = simpleDateFormat.parse(endDate);
+                Course newCourse = new Course(courseName, status, parsedStartDate, parsedEndDate);
+                isDone = courseDAO.addCourse(newCourse);
+                ArrayList<Course> courses = courseDAO.findCoursesByStatus(COURSE_OPENED_STATUS);
+                int courseId = 0;
+                for (Course course : courses) {
+                    if (course.getName().equals(courseName)) {
+                        courseId = course.getId();
+                    }
                 }
+                ArchiveService archiveService = new ArchiveService();
+                archiveService.addArchive(teacherId, courseId);
+            } catch (TechnicalException | ParseException e) {
+                LOGGER.error(e);
             }
-            ArchiveService archiveService = new ArchiveService();
-            archiveService.addArchive(teacherId, courseId);
-        } catch (TechnicalException | ParseException e) {
-            LOGGER.error(e);
+        } else {
+            throw new LogicalException(ConfigurationManager.getProperty("validation.error"));
         }
         return isDone;
     }
@@ -70,6 +78,16 @@ public class CourseService {
         boolean isDone = false;
         try {
             isDone = courseDAO.changeCourse(course);
+        } catch (TechnicalException e) {
+            LOGGER.error(e);
+        }
+        return isDone;
+    }
+
+    public boolean deleteCourse(int courseId) {
+        boolean isDone = false;
+        try {
+            isDone = courseDAO.deleteCourse(courseId);
         } catch (TechnicalException e) {
             LOGGER.error(e);
         }

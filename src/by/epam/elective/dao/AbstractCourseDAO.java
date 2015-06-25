@@ -16,4 +16,6 @@ public abstract class AbstractCourseDAO extends AbstractDAO {
     public abstract Course findCourseById(int courseId) throws TechnicalException;
 
     public abstract boolean changeCourse(Course course) throws TechnicalException;
+
+    public abstract boolean deleteCourse(int courseId) throws TechnicalException;
 }

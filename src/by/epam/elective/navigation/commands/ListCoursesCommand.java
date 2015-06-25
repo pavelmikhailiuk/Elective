@@ -23,6 +23,7 @@ public class ListCoursesCommand implements Command {
         int status = Integer.parseInt(request.getParameter(COURSE_STATUS));
         ArrayList<Course> coursesList = courseService.findCoursesByStatus(status, user.getRole(), user.getId());
         request.setAttribute(COURSES_LIST, coursesList);
+        request.setAttribute("courseStatus", status);
         return ConfigurationManager.getProperty("path.page.list.courses");
     }
 }

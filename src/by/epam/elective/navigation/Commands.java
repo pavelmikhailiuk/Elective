@@ -48,12 +48,17 @@ public enum Commands {
         public Command getCommand() {
             return new ListStudentsCommand();
         }
+    }, DELETE_COURSE {
+        @Override
+        public Command getCommand() {
+            return new DeleteCourseCommand();
+        }
     }, ESCAPE_COURSE {
         @Override
         public Command getCommand() {
             return new EscapeCourseCommand();
         }
-    },END_COURSE {
+    }, END_COURSE {
         @Override
         public Command getCommand() {
             return new EndCourseCommand();

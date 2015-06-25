@@ -5,7 +5,9 @@ import by.epam.elective.dao.UserDAO;
 import by.epam.elective.encoder.PasswordEncoder;
 import by.epam.elective.entity.Archive;
 import by.epam.elective.entity.User;
+import by.epam.elective.exception.LogicalException;
 import by.epam.elective.exception.TechnicalException;
+import by.epam.elective.resource.ConfigurationManager;
 import by.epam.elective.validator.FormValidator;
 import org.apache.log4j.Logger;
 
@@ -22,7 +24,7 @@ public class UserService {
     public static final String USERNAME = "username";
     public static final String SURNAME = "surname";
 
-    public boolean addUser(String username, String surname, String login, String password, int role) {
+    public boolean addUser(String username, String surname, String login, String password, int role) throws LogicalException {
         boolean isDone = false;
         try {
             if (validator.validate(USERNAME, username) && validator.validate(SURNAME, surname)
@@ -31,6 +33,8 @@ public class UserService {
                 password = encoder.encode(password);
                 User user = initUser(username, surname, login, password, role);
                 isDone = userDAO.addUser(user);
+            } else {
+                throw new LogicalException(ConfigurationManager.getProperty("validation.error"));
             }
         } catch (TechnicalException e) {
             LOGGER.error(e);
@@ -38,11 +42,13 @@ public class UserService {
         return isDone;
     }
 
-    public User checkUser(String login, String password) {
+    public User checkUser(String login, String password) throws LogicalException {
         User user = null;
         try {
             if (validator.validate(LOGIN, login) && (validator.validate(PASSWORD, password))) {
                 user = userDAO.checkUser(encoder.encode(login), encoder.encode(password));
+            } else {
+                throw new LogicalException(ConfigurationManager.getProperty("validation.error"));
             }
         } catch (TechnicalException e) {
             LOGGER.error(e);
@@ -80,7 +86,7 @@ public class UserService {
         return user;
     }
 
-    public ArrayList<User> listStudents(int courseId, int teacherId) {
+    public ArrayList<User> listStudents(int courseId) {
         ArchiveService archiveService = new ArchiveService();
         ArrayList<Archive> archiveByCourseId = archiveService.findArchiveByCourseId(courseId);
         Iterator<Archive> archiveIterator = archiveByCourseId.iterator();
@@ -88,27 +94,9 @@ public class UserService {
         while (archiveIterator.hasNext()) {
             Archive archive = archiveIterator.next();
             int archiveUserId = archive.getUserId();
-            if (archiveUserId == teacherId) {
-                archiveIterator.remove();
-                continue;
-            }
             User student = findUserById(archiveUserId);
             studentsList.add(student);
         }
         return studentsList;
-    }
-
-    public ArrayList<Archive> listMarks(int courseId, int teacherId) {
-        ArchiveService archiveService = new ArchiveService();
-        ArrayList<Archive> archiveByCourseId = archiveService.findArchiveByCourseId(courseId);
-        Iterator<Archive> archiveIterator = archiveByCourseId.iterator();
-        while (archiveIterator.hasNext()) {
-            Archive archive = archiveIterator.next();
-            int archiveUserId = archive.getUserId();
-            if (archiveUserId == teacherId) {
-                archiveIterator.remove();
-            }
-        }
-        return archiveByCourseId;
     }
 }

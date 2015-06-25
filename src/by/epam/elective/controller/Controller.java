@@ -1,5 +1,6 @@
 package by.epam.elective.controller;
 
+import by.epam.elective.exception.LogicalException;
 import by.epam.elective.navigation.Command;
 import by.epam.elective.navigation.CommandFactory;
 import by.epam.elective.pool.ConnectionPool;
@@ -48,7 +49,12 @@ public class Controller extends HttpServlet {
         String page = request.getParameter(REQUEST_PARAMETER_PAGE);
         if (page != null) {
             Command command = CommandFactory.getCommand(page);
-            String nextPage = command.execute(request);
+            String nextPage = null;
+            try {
+                nextPage = command.execute(request);
+            } catch (LogicalException e) {
+                LOGGER.error(e);
+            }
             RequestDispatcher requestDispatcher = request.getRequestDispatcher(nextPage);
             requestDispatcher.forward(request, response);
         } else {

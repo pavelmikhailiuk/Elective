@@ -2,7 +2,6 @@ package by.epam.elective.dao;
 
 import by.epam.elective.entity.User;
 import by.epam.elective.exception.TechnicalException;
-import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 

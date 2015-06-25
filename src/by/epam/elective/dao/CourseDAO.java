@@ -16,12 +16,13 @@ import java.util.ResourceBundle;
 public class CourseDAO extends AbstractCourseDAO {
     public static final String ADD_NEW_COURSE = "INSERT INTO courses (course_name, status_id, start_date, end_date) VALUES (?,?,?,?)";
     public static final String SELECT_COURSES_BY_STATUS_USER_ID = "SELECT DISTINCT courses.course_id, courses.course_name, courses.status_id, " +
-            "courses.start_date, courses.end_date FROM archives, courses WHERE courses.course_id=archives.course_id and archives.user_id=? AND courses.status_id=?";
-    public static final String SELECT_COURSES_BY_STATUS_NOT_USER_ID = "SELECT DISTINCT courses.course_id, courses.course_name, courses.status_id, " +
-            "courses.start_date, courses.end_date FROM archives, courses where courses.course_id=archives.course_id and archives.user_id<>? AND courses.status_id=?";
+            "courses.start_date, courses.end_date FROM archives, courses WHERE courses.course_id=archives.course_id AND archives.user_id=? AND courses.status_id=?";
+    public static final String SELECT_COURSES_BY_STATUS_NOT_USER_ID = "SELECT DISTINCT courses.course_id, courses.course_name, courses.status_id, courses.start_date," +
+            " courses.end_date FROM courses, archives  WHERE courses.course_id=archives.course_id AND courses.status_id=? AND archives.course_id NOT IN (SELECT course_id FROM archives WHERE user_id=?)";
     public static final String SELECT_COURSES_BY_STATUS = "SELECT * FROM courses WHERE status_id=?";
     public static final String UPDATE_COURSE_BY_COURSE_ID = "UPDATE courses SET course_name=?, status_id=?, start_date=?, end_date=? WHERE course_id=?";
-    private static final String SELECT_COURSES_BY_COURSE_ID ="SELECT * FROM courses WHERE course_id=?";
+    private static final String SELECT_COURSES_BY_COURSE_ID = "SELECT * FROM courses WHERE course_id=?";
+    private static final String DELETE_COURSE_BY_COURSE_ID = "DELETE FROM courses WHERE course_id=?;";
     private static ResourceBundle errorMessage = ResourceBundle.getBundle("resources.errorMessage");
 
     @Override
@@ -60,11 +61,14 @@ public class CourseDAO extends AbstractCourseDAO {
             connection = connectionPool.getConnection();
             if (joined) {
                 preparedStatement = connection.prepareStatement(SELECT_COURSES_BY_STATUS_USER_ID);
+                preparedStatement.setInt(2, status);
+                preparedStatement.setInt(1, userId);
             } else {
                 preparedStatement = connection.prepareStatement(SELECT_COURSES_BY_STATUS_NOT_USER_ID);
+                preparedStatement.setInt(1, status);
+                preparedStatement.setInt(2, userId);
             }
-            preparedStatement.setInt(2, status);
-            preparedStatement.setInt(1, userId);
+
             resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 courses.add(initCourse(resultSet));
@@ -105,7 +109,7 @@ public class CourseDAO extends AbstractCourseDAO {
     @Override
     public Course findCourseById(int courseId) throws TechnicalException {
         ConnectionPool connectionPool = ConnectionPool.getInstance();
-        Course course=null;
+        Course course = null;
         ResultSet resultSet = null;
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -115,7 +119,7 @@ public class CourseDAO extends AbstractCourseDAO {
             preparedStatement.setInt(1, courseId);
             resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
-                course=initCourse(resultSet);
+                course = initCourse(resultSet);
             }
         } catch (SQLException e) {
             throw new TechnicalException(errorMessage.getString("error.get.course.by.id"), e);
@@ -145,6 +149,27 @@ public class CourseDAO extends AbstractCourseDAO {
             isDone = true;
         } catch (SQLException e) {
             throw new TechnicalException(errorMessage.getString("error.change.course"), e);
+        } finally {
+            close(preparedStatement);
+            put(connection, connectionPool);
+        }
+        return isDone;
+    }
+
+    @Override
+    public boolean deleteCourse(int courseId) throws TechnicalException {
+        boolean isDone = false;
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        try {
+            connection = connectionPool.getConnection();
+            preparedStatement = connection.prepareStatement(DELETE_COURSE_BY_COURSE_ID);
+            preparedStatement.setInt(1, courseId);
+            preparedStatement.executeUpdate();
+            isDone = true;
+        } catch (SQLException e) {
+            throw new TechnicalException(errorMessage.getString("error.delete.from.courses"), e);
         } finally {
             close(preparedStatement);
             put(connection, connectionPool);

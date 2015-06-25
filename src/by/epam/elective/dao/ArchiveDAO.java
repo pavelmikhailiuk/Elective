@@ -1,7 +1,7 @@
 package by.epam.elective.dao;
 
-import by.epam.elective.exception.TechnicalException;
 import by.epam.elective.entity.Archive;
+import by.epam.elective.exception.TechnicalException;
 import by.epam.elective.pool.ConnectionPool;
 
 import java.sql.Connection;

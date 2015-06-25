@@ -50,11 +50,11 @@
                             </c:if>
                         </c:if>
                         <c:if test="${user.role==3}">
-                            <c:if test="${course.statusId==0}">
+                            <c:if test="${courseStatus==0}">
                                 <input type="hidden" name="page" value="join_course"/>
                                 <input class="submit-button" type="submit" value=<fmt:message key="list.courses.join"/>>
                             </c:if>
-                            <c:if test="${course.statusId==1}">
+                            <c:if test="${courseStatus==10}">
                                 <input type="hidden" name="page" value="escape_course"/>
                                 <input class="submit-button" type="submit" value=<fmt:message key="list.courses.escape"/>>
                             </c:if>

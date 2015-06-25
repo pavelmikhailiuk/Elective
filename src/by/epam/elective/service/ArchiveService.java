@@ -12,16 +12,6 @@ public class ArchiveService {
     private final static Logger LOGGER = Logger.getLogger(ArchiveService.class);
     private AbstractArchiveDAO archiveDAO = new ArchiveDAO();
 
-    public ArrayList<Archive> findArchiveByUserId(int userId) {
-        ArrayList<Archive> archives = null;
-        try {
-            archives = archiveDAO.findArchiveByUserId(userId);
-        } catch (TechnicalException e) {
-            LOGGER.error(e);
-        }
-        return archives;
-    }
-
     public ArrayList<Archive> findArchiveByCourseId(int courseId) {
         ArrayList<Archive> archives = null;
         try {

@@ -1,6 +1,7 @@
 package by.epam.elective.navigation.commands;
 
 import by.epam.elective.entity.User;
+import by.epam.elective.exception.LogicalException;
 import by.epam.elective.navigation.Command;
 import by.epam.elective.resource.ConfigurationManager;
 import by.epam.elective.service.UserService;
@@ -18,7 +19,7 @@ public class AddUserCommand implements Command {
     public static final String PASSWORD = "password";
 
     @Override
-    public String execute(HttpServletRequest request) {
+    public String execute(HttpServletRequest request) throws LogicalException {
         HttpSession session = request.getSession();
         UserService userService = new UserService();
         String login = request.getParameter(LOGIN);
@@ -28,7 +29,7 @@ public class AddUserCommand implements Command {
         if (user == null) {
             boolean isDone = false;
             User admin = (User) session.getAttribute(USER);
-            if (admin==null) {
+            if (admin == null) {
                 isDone = userService.addUser(request.getParameter(USERNAME), request.getParameter(SURNAME), login, password, STUDENT_ROLE);
                 if (isDone) {
                     user = userService.checkUser(login, password);

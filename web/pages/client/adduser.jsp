@@ -25,11 +25,11 @@
                     <div class="form-title"><h2><fmt:message key="add.user.formMessage"/></h2></div>
 
                     <div class="form-title"><fmt:message key="add.user.form.username"/></div>
-                    <input class="form-field" type="text" name="username" pattern="([A-Z][a-z]+)|([А-Я][а-я]+)"
+                    <input class="form-field" type="text" name="username" pattern="(^[A-Z][a-z]+)$|^([А-Я][а-я]+)$"
                            required/><br/>
 
                     <div class="form-title"><fmt:message key="add.user.form.surname"/></div>
-                    <input class="form-field" type="text" name="surname" pattern="([A-Z][a-z]+)|([А-Я][а-я]+)"
+                    <input class="form-field" type="text" name="surname" pattern="(^[A-Z][a-z]+)$|^([А-Я][а-я]+)$"
                            required/><br/>
 
                     <div class="form-title"><fmt:message key="add.user.form.login"/></div>
