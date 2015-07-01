@@ -22,10 +22,10 @@
         <form action="Controller" method="post" class="form-container">
           <div class="form-title"><h2><fmt:message key="index.form.authorisation"/></h2></div>
           <div class="form-title"><fmt:message key="index.form.login"/></div>
-          <input class="form-field" type="text" name="login" pattern="[\w]{3,8}" required /><br/>
+          <input class="form-field" type="text" name="login" pattern="[\w]{5,8}" required /><br/>
 
           <div class="form-title"><fmt:message key="index.form.password"/></div>
-          <input class="form-field" type="password" name="password" pattern="[\w]{3,8}" required /><br/>
+          <input class="form-field" type="password" name="password" pattern="[\w]{6,8}" required /><br/>
 
           <div class="submit-container">
             <input type="hidden" name="page" value="login"/>

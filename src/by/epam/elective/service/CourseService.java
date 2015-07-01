@@ -5,7 +5,6 @@ import by.epam.elective.dao.CourseDAO;
 import by.epam.elective.entity.Course;
 import by.epam.elective.exception.LogicalException;
 import by.epam.elective.exception.TechnicalException;
-import by.epam.elective.resource.ConfigurationManager;
 import by.epam.elective.validator.FormValidator;
 import org.apache.log4j.Logger;
 
@@ -22,34 +21,36 @@ public class CourseService {
     public static final int ADMIN_ROLE = 1;
     public static final int TEACHER_ROLE = 2;
     public static final int STUDENT_ROLE = 3;
-    public static final String DATE_PARSE_PATTERN = "yyyy-MM-dd";
+    public static final String DATE_PARSE_PATTERN = "MM/dd/yyyy";
     public static final int COURSE_OPENED_AND_CLOSED_STATUS = 10;
     private AbstractCourseDAO courseDAO = new CourseDAO();
 
     public boolean addCourse(String courseName, int status, String startDate, String endDate, int teacherId) throws LogicalException {
         boolean isDone = false;
         FormValidator validator = new FormValidator();
-        if ((validator.validate("startDate", startDate)) && (validator.validate("endDate", endDate))) {
-            try {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_PARSE_PATTERN);
-                Date parsedStartDate = simpleDateFormat.parse(startDate);
-                Date parsedEndDate = simpleDateFormat.parse(endDate);
-                Course newCourse = new Course(courseName, status, parsedStartDate, parsedEndDate);
-                isDone = courseDAO.addCourse(newCourse);
-                ArrayList<Course> courses = courseDAO.findCoursesByStatus(COURSE_OPENED_STATUS);
-                int courseId = 0;
-                for (Course course : courses) {
-                    if (course.getName().equals(courseName)) {
-                        courseId = course.getId();
-                    }
-                }
-                ArchiveService archiveService = new ArchiveService();
-                archiveService.addArchive(teacherId, courseId);
-            } catch (TechnicalException | ParseException e) {
-                LOGGER.error(e);
+        if (!(validator.validate("startDate", startDate) && validator.validate("endDate", endDate) && validator.validate("courseName", courseName))) {
+            throw new LogicalException("Validation error");
+        }
+        try {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DATE_PARSE_PATTERN);
+            Date parsedStartDate = simpleDateFormat.parse(startDate);
+            Date parsedEndDate = simpleDateFormat.parse(endDate);
+            if (parsedEndDate.before(parsedStartDate)) {
+                throw new LogicalException("Incorrect dates");
             }
-        } else {
-            throw new LogicalException(ConfigurationManager.getProperty("validation.error"));
+            Course newCourse = new Course(courseName, status, parsedStartDate, parsedEndDate);
+            isDone = courseDAO.addCourse(newCourse);
+            ArrayList<Course> courses = courseDAO.findCoursesByStatus(COURSE_OPENED_STATUS);
+            int courseId = 0;
+            for (Course course : courses) {
+                if (course.getName().equals(courseName)) {
+                    courseId = course.getId();
+                }
+            }
+            ArchiveService archiveService = new ArchiveService();
+            archiveService.addArchive(teacherId, courseId);
+        } catch (TechnicalException | ParseException e) {
+            LOGGER.error(e);
         }
         return isDone;
     }

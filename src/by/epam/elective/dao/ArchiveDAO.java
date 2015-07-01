@@ -9,7 +9,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.ResourceBundle;
 
 public class ArchiveDAO extends AbstractArchiveDAO {
     public static final String SELECT_FROM_ARCHIVES_BY_USER_ID = "SELECT * FROM archives WHERE user_id=?";
@@ -17,7 +16,6 @@ public class ArchiveDAO extends AbstractArchiveDAO {
     public static final String INSERT_INTO_ARCHIVES_USER_ID_COURSE_ID = "INSERT INTO archives (user_id, course_id) VALUES (?,?)";
     public static final String SET_MARK_BY_USER_ID_AND_COURSE_ID = "UPDATE archives SET mark=? WHERE (user_id=? AND course_id=?)";
     public static final String REMOVE_FROM_ARCHIVES_BY_USER_ID = "DELETE FROM archives WHERE (user_id=? AND course_id=?)";
-    private static ResourceBundle errorMessage = ResourceBundle.getBundle("resources.errorMessage");
 
     @Override
     public ArrayList<Archive> findArchiveByUserId(int userId) throws TechnicalException {
@@ -35,10 +33,10 @@ public class ArchiveDAO extends AbstractArchiveDAO {
                 archive.add(initArchive(resultSet));
             }
         } catch (SQLException e) {
-            throw new TechnicalException(errorMessage.getString("error.get.archive.by.user.id"), e);
+            throw new TechnicalException("Error get archive by user id", e);
         } finally {
             close(preparedStatement);
-            put(connection, connectionPool);
+            connectionPool.putConnection(connection);
         }
         return archive;
     }
@@ -59,10 +57,10 @@ public class ArchiveDAO extends AbstractArchiveDAO {
                 archive.add(initArchive(resultSet));
             }
         } catch (SQLException e) {
-            throw new TechnicalException(errorMessage.getString("error.get.archive.by.course.id"), e);
+            throw new TechnicalException("Error get archive by course id", e);
         } finally {
             close(preparedStatement);
-            put(connection, connectionPool);
+            connectionPool.putConnection(connection);
         }
         return archive;
     }
@@ -81,10 +79,10 @@ public class ArchiveDAO extends AbstractArchiveDAO {
             preparedStatement.executeUpdate();
             isDone = true;
         } catch (SQLException e) {
-            throw new TechnicalException(errorMessage.getString("error.archive.insert"), e);
+            throw new TechnicalException("Error archive insert", e);
         } finally {
             close(preparedStatement);
-            put(connection, connectionPool);
+            connectionPool.putConnection(connection);
         }
         return isDone;
     }
@@ -103,10 +101,10 @@ public class ArchiveDAO extends AbstractArchiveDAO {
             preparedStatement.executeUpdate();
             isDone = true;
         } catch (SQLException e) {
-            throw new TechnicalException(errorMessage.getString("error.remove.from.archive"), e);
+            throw new TechnicalException("Error remove from archive", e);
         } finally {
             close(preparedStatement);
-            put(connection, connectionPool);
+            connectionPool.putConnection(connection);
         }
         return isDone;
     }
@@ -126,10 +124,10 @@ public class ArchiveDAO extends AbstractArchiveDAO {
             preparedStatement.executeUpdate();
             isDone = true;
         } catch (SQLException e) {
-            throw new TechnicalException(errorMessage.getString("error.update.marks"), e);
+            throw new TechnicalException("Error update marks", e);
         } finally {
             close(preparedStatement);
-            put(connection, connectionPool);
+            connectionPool.putConnection(connection);
         }
         return isDone;
     }
@@ -142,7 +140,7 @@ public class ArchiveDAO extends AbstractArchiveDAO {
             archive.setCourseId(resultSet.getInt(3));
             archive.setMark(resultSet.getInt(4));
         } catch (SQLException e) {
-            throw new TechnicalException(errorMessage.getString("error.archive.initialization"), e);
+            throw new TechnicalException("Error archive initialization", e);
         }
         return archive;
     }

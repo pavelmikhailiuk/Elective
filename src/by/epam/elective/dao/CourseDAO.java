@@ -23,7 +23,6 @@ public class CourseDAO extends AbstractCourseDAO {
     public static final String UPDATE_COURSE_BY_COURSE_ID = "UPDATE courses SET course_name=?, status_id=?, start_date=?, end_date=? WHERE course_id=?";
     private static final String SELECT_COURSES_BY_COURSE_ID = "SELECT * FROM courses WHERE course_id=?";
     private static final String DELETE_COURSE_BY_COURSE_ID = "DELETE FROM courses WHERE course_id=?;";
-    private static ResourceBundle errorMessage = ResourceBundle.getBundle("resources.errorMessage");
 
     @Override
     public boolean addCourse(Course course) throws TechnicalException {
@@ -42,10 +41,10 @@ public class CourseDAO extends AbstractCourseDAO {
             preparedStatement.executeUpdate();
             isDone = true;
         } catch (SQLException e) {
-            throw new TechnicalException(errorMessage.getString("error.add.new.course"), e);
+            throw new TechnicalException("Error add new course", e);
         } finally {
             close(preparedStatement);
-            put(connection, connectionPool);
+            connectionPool.putConnection(connection);
         }
         return isDone;
     }
@@ -74,10 +73,10 @@ public class CourseDAO extends AbstractCourseDAO {
                 courses.add(initCourse(resultSet));
             }
         } catch (SQLException e) {
-            throw new TechnicalException(errorMessage.getString("error.get.course.by.status.user.id"), e);
+            throw new TechnicalException("Error get course by status user id", e);
         } finally {
             close(preparedStatement);
-            put(connection, connectionPool);
+            connectionPool.putConnection(connection);
         }
         return courses;
     }
@@ -98,10 +97,10 @@ public class CourseDAO extends AbstractCourseDAO {
                 courses.add(initCourse(resultSet));
             }
         } catch (SQLException e) {
-            throw new TechnicalException(errorMessage.getString("error.get.course.by.status"), e);
+            throw new TechnicalException("Error get course by status", e);
         } finally {
             close(preparedStatement);
-            put(connection, connectionPool);
+            connectionPool.putConnection(connection);
         }
         return courses;
     }
@@ -122,10 +121,10 @@ public class CourseDAO extends AbstractCourseDAO {
                 course = initCourse(resultSet);
             }
         } catch (SQLException e) {
-            throw new TechnicalException(errorMessage.getString("error.get.course.by.id"), e);
+            throw new TechnicalException("Error get course by id", e);
         } finally {
             close(preparedStatement);
-            put(connection, connectionPool);
+            connectionPool.putConnection(connection);
         }
         return course;
     }
@@ -148,10 +147,10 @@ public class CourseDAO extends AbstractCourseDAO {
             preparedStatement.executeUpdate();
             isDone = true;
         } catch (SQLException e) {
-            throw new TechnicalException(errorMessage.getString("error.change.course"), e);
+            throw new TechnicalException("Error change course", e);
         } finally {
             close(preparedStatement);
-            put(connection, connectionPool);
+            connectionPool.putConnection(connection);
         }
         return isDone;
     }
@@ -169,10 +168,10 @@ public class CourseDAO extends AbstractCourseDAO {
             preparedStatement.executeUpdate();
             isDone = true;
         } catch (SQLException e) {
-            throw new TechnicalException(errorMessage.getString("error.delete.from.courses"), e);
+            throw new TechnicalException("Error delete from courses", e);
         } finally {
             close(preparedStatement);
-            put(connection, connectionPool);
+            connectionPool.putConnection(connection);
         }
         return isDone;
     }
@@ -187,7 +186,7 @@ public class CourseDAO extends AbstractCourseDAO {
             course.setStartDate(simpleDateFormat.parse(resultSet.getString(4)));
             course.setEndDate(simpleDateFormat.parse(resultSet.getString(5)));
         } catch (SQLException | ParseException e) {
-            throw new TechnicalException(errorMessage.getString("error.course.initialization"), e);
+            throw new TechnicalException("Error course initialization", e);
         }
         return course;
     }

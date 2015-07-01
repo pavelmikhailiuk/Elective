@@ -1,6 +1,7 @@
 package test.by.epam.elective;
 
 
+import by.epam.elective.exception.TechnicalException;
 import by.epam.elective.pool.ConnectionPool;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -16,7 +17,7 @@ public class ConnectionPoolTest {
     }
 
     @Test
-    public void getConnectionTest() {
+    public void getConnectionTest() throws TechnicalException {
         for (int i = 0; i < 20; i++) {
             Assert.assertNotNull(connectionPool.getConnection());
         }

@@ -7,7 +7,6 @@ import by.epam.elective.entity.Archive;
 import by.epam.elective.entity.User;
 import by.epam.elective.exception.LogicalException;
 import by.epam.elective.exception.TechnicalException;
-import by.epam.elective.resource.ConfigurationManager;
 import by.epam.elective.validator.FormValidator;
 import org.apache.log4j.Logger;
 
@@ -27,15 +26,14 @@ public class UserService {
     public boolean addUser(String username, String surname, String login, String password, int role) throws LogicalException {
         boolean isDone = false;
         try {
-            if (validator.validate(USERNAME, username) && validator.validate(SURNAME, surname)
-                    && validator.validate(LOGIN, login) && validator.validate(PASSWORD, password)) {
-                login = encoder.encode(login);
-                password = encoder.encode(password);
-                User user = initUser(username, surname, login, password, role);
-                isDone = userDAO.addUser(user);
-            } else {
-                throw new LogicalException(ConfigurationManager.getProperty("validation.error"));
+            if (!(validator.validate(USERNAME, username) && validator.validate(SURNAME, surname)
+                    && validator.validate(LOGIN, login) && validator.validate(PASSWORD, password))) {
+                throw new LogicalException("Validation error");
             }
+            login = encoder.encode(login);
+            password = encoder.encode(password);
+            User user = initUser(username, surname, login, password, role);
+            isDone = userDAO.addUser(user);
         } catch (TechnicalException e) {
             LOGGER.error(e);
         }
@@ -45,10 +43,10 @@ public class UserService {
     public User checkUser(String login, String password) throws LogicalException {
         User user = null;
         try {
-            if (validator.validate(LOGIN, login) && (validator.validate(PASSWORD, password))) {
+            if (validator.validate(LOGIN, login) && validator.validate(PASSWORD, password)) {
                 user = userDAO.checkUser(encoder.encode(login), encoder.encode(password));
             } else {
-                throw new LogicalException(ConfigurationManager.getProperty("validation.error"));
+                throw new LogicalException("Validation error");
             }
         } catch (TechnicalException e) {
             LOGGER.error(e);

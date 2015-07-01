@@ -1,6 +1,6 @@
 package by.epam.elective.controller;
 
-import by.epam.elective.exception.LogicalException;
+import by.epam.elective.exception.TechnicalException;
 import by.epam.elective.navigation.Command;
 import by.epam.elective.navigation.CommandFactory;
 import by.epam.elective.pool.ConnectionPool;
@@ -46,14 +46,18 @@ public class Controller extends HttpServlet {
     }
 
     private void performAction(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        String page = request.getParameter(REQUEST_PARAMETER_PAGE);
-        if (page != null) {
-            Command command = CommandFactory.getCommand(page);
-            String nextPage = null;
+        String commandName = request.getParameter(REQUEST_PARAMETER_PAGE);
+        if (commandName != null) {
+            Command command = null;
             try {
-                nextPage = command.execute(request);
-            } catch (LogicalException e) {
+                command = CommandFactory.getCommand(commandName);
+            } catch (TechnicalException e) {
+                response.sendError(500);
                 LOGGER.error(e);
+            }
+            String nextPage = null;
+            if (command != null) {
+                nextPage = command.execute(request);
             }
             RequestDispatcher requestDispatcher = request.getRequestDispatcher(nextPage);
             requestDispatcher.forward(request, response);

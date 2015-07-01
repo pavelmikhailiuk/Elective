@@ -9,14 +9,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.ResourceBundle;
 
 public class UserDAO extends AbstractUserDAO {
     public static final String ADD_NEW_USER = "INSERT INTO users (user_name, user_surname, login, password, role) VALUES (?,?,?,?,?)";
     public static final String CHECK_USER_BY_LOGIN_AND_PASSWORD = "SELECT * FROM users where login=? and password=?";
     public static final String SELECT_USERS_BY_ROLE = "SELECT * FROM users WHERE role=?";
     public static final String SELECT_USER_BY_ID = "SELECT * FROM users WHERE user_id=?";
-    private static ResourceBundle errorMessage = ResourceBundle.getBundle("resources.errorMessage");
 
     @Override
     public boolean addUser(User user) throws TechnicalException {
@@ -35,10 +33,10 @@ public class UserDAO extends AbstractUserDAO {
             preparedStatement.executeUpdate();
             isDone = true;
         } catch (SQLException e) {
-            throw new TechnicalException(errorMessage.getString("error.add.new.user"), e);
+            throw new TechnicalException("Error add new user", e);
         } finally {
             close(preparedStatement);
-            put(connection, connectionPool);
+            connectionPool.putConnection(connection);
         }
         return isDone;
     }
@@ -60,10 +58,10 @@ public class UserDAO extends AbstractUserDAO {
                 user = initUser(resultSet);
             }
         } catch (SQLException e) {
-            throw new TechnicalException(errorMessage.getString("error.check.existing.user"), e);
+            throw new TechnicalException("Error check existing user", e);
         } finally {
             close(preparedStatement);
-            put(connection, connectionPool);
+            connectionPool.putConnection(connection);
         }
         return user;
     }
@@ -84,10 +82,10 @@ public class UserDAO extends AbstractUserDAO {
                 users.add(initUser(resultSet));
             }
         } catch (SQLException e) {
-            throw new TechnicalException(errorMessage.getString("error.get.users.by.role"), e);
+            throw new TechnicalException("Error get users by role", e);
         } finally {
             close(preparedStatement);
-            put(connection, connectionPool);
+            connectionPool.putConnection(connection);
         }
         return users;
     }
@@ -108,10 +106,10 @@ public class UserDAO extends AbstractUserDAO {
                 user = initUser(resultSet);
             }
         } catch (SQLException e) {
-            throw new TechnicalException(errorMessage.getString("error.get.users.by.id"), e);
+            throw new TechnicalException("Error get users by id", e);
         } finally {
             close(preparedStatement);
-            put(connection, connectionPool);
+            connectionPool.putConnection(connection);
         }
         return user;
     }
@@ -126,7 +124,7 @@ public class UserDAO extends AbstractUserDAO {
             user.setPassword(resultSet.getString(5));
             user.setRole(resultSet.getInt(6));
         } catch (SQLException e) {
-            throw new TechnicalException(errorMessage.getString("error.user.initialization"), e);
+            throw new TechnicalException("Error user initialization", e);
         }
         return user;
     }

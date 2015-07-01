@@ -7,17 +7,16 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
 
-public class DBConnector {
+class DBConnector {
     private static ResourceBundle dbConfig = ResourceBundle.getBundle("resources.db");
-    private static ResourceBundle errorMessage = ResourceBundle.getBundle("resources.errorMessage");
 
-    public static Connection getConnection() throws TechnicalException {
+    static Connection getConnection() throws TechnicalException {
         Connection connection = null;
         try {
             DriverManager.registerDriver(new com.mysql.jdbc.Driver());
             connection = DriverManager.getConnection(dbConfig.getString("url"), dbConfig.getString("user"), dbConfig.getString("password"));
         } catch (SQLException e) {
-            throw new TechnicalException(errorMessage.getString("cant.connect.to.database"), e);
+            throw new TechnicalException("Can't connect to database", e);
         }
         return connection;
     }
