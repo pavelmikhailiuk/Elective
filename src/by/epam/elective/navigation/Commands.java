@@ -83,6 +83,16 @@ public enum Commands {
         public Command getCommand() {
             return new NewCourseCommand();
         }
+    }, CHANGE_COURSE {
+        @Override
+        public Command getCommand() {
+            return new ChangeCourseCommand();
+        }
+    }, SET_COURSE {
+        @Override
+        public Command getCommand() {
+            return new SetCourseCommand();
+        }
     };
 
     public abstract Command getCommand();

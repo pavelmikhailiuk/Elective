@@ -16,15 +16,18 @@ public class ListStudentsCommand implements Command {
     public static final String COURSE_ID = "courseId";
     public static final String MARKS_LIST = "marksList";
     public static final String STUDENTS_LIST_SIZE = "studentsListSize";
+    public static final String SET_MARK = "setMark";
 
     @Override
     public String execute(HttpServletRequest request) {
         HttpSession session = request.getSession();
         int courseId = Integer.parseInt(request.getParameter(COURSE_ID));
+        String setMark = request.getParameter(SET_MARK);
         UserService userService = new UserService();
         ArchiveService archiveService = new ArchiveService();
         ArrayList<User> studentsList = userService.listStudents(courseId);
         ArrayList<Archive> marksList = archiveService.findArchiveByCourseId(courseId);
+        session.setAttribute(SET_MARK, setMark);
         session.setAttribute(STUDENTS_LIST, studentsList);
         session.setAttribute(COURSE_ID, courseId);
         session.setAttribute(MARKS_LIST, marksList);

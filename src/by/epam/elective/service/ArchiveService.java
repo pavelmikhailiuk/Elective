@@ -7,6 +7,7 @@ import by.epam.elective.exception.TechnicalException;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class ArchiveService {
     private final static Logger LOGGER = Logger.getLogger(ArchiveService.class);
@@ -20,6 +21,26 @@ public class ArchiveService {
             LOGGER.error(e);
         }
         return archives;
+    }
+
+    public Archive findArchiveByCourseIdUserId(int courseId, int userId) {
+        ArrayList<Archive> archives = null;
+        Archive userArchive = null;
+        try {
+            archives = archiveDAO.findArchiveByCourseId(courseId);
+        } catch (TechnicalException e) {
+            LOGGER.error(e);
+        }
+        if (archives != null && archives.size() != 0) {
+            Iterator<Archive> archiveIterator = archives.iterator();
+            while (archiveIterator.hasNext()) {
+                Archive archive = archiveIterator.next();
+                if (archive.getUserId() == userId) {
+                    userArchive = archive;
+                }
+            }
+        }
+        return userArchive;
     }
 
     public boolean addArchive(int userId, int courseId) {

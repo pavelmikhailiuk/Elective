@@ -34,10 +34,11 @@
                                     <c:if test="${user.role==2}">
                                         <c:if test="${student.role!=2}">
                                             <c:if test="${archive.mark==0}">
-                                                <c:set var="nomark" value="true"/>
-                                                <input class="form-smallfield" type="text" name="${student.id}"
-                                                       pattern="^10$|^[1-9]$"
-                                                       required/>
+                                                <c:if test="${setMark eq true}">
+                                                    <input class="form-smallfield" type="text" name="${student.id}"
+                                                           pattern="^10$|^[1-9]$"
+                                                           required/>
+                                                </c:if>
                                             </c:if>
                                             <c:if test="${archive.mark!=0}">
                                                 <c:out value="${archive.mark}"/>
@@ -52,7 +53,8 @@
                                             <div class="submit-container">
                                                 <input type="hidden" name="teacherId" value="${student.id}">
                                                 <input type="hidden" name="page" value="delete_course">
-                                                <button class="submit-button" type="submit"><fmt:message key="list.students.delete.course"/></button>
+                                                <button class="submit-button" type="submit"><fmt:message
+                                                        key="list.students.delete.course"/></button>
                                             </div>
                                         </c:if>
                                     </c:if>
@@ -62,7 +64,8 @@
                     </c:forEach>
 
                     <c:if test="${user.role==2}">
-                        <c:if test="${nomark==true}">
+                        <c:if test="${setMark eq true}">
+                            <c:remove var="noMark" scope="session"/>
                             <div class="submit-container">
                                 <input type="hidden" name="page" value="set_marks"/>
                                 <button class="submit-button" type="submit"><fmt:message
